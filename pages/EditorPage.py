@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageTk
 from tkinter import messagebox as mb
+from helper.DrawSquare import DrawSquareApp
 
 
 class EDITORPAGE(tk.Frame):
@@ -21,20 +22,12 @@ class EDITORPAGE(tk.Frame):
 
         # Place frames in grid
         frame1.grid(row=0, column=0, sticky="nsew")  # 20% width
+        
+        
         frame2.grid(row=0, column=1, sticky="nsew")  # 80% width
-        
-        label3 = tk.Button(frame1, text = "New",command =self.show_file_page)
-        label3.pack(padx=10,pady=10,fill="both", expand=False)
-        
-        label4 = tk.Button(frame1, text = "Crop")
-        label4.pack(padx=10,pady=10,fill="both", expand=False)
-        
-        label5 = tk.Button(frame1, text = "Resize")
-        label5.pack(padx=10,pady=10,fill="both", expand=False)
-        
-        
-        
-        
+        self.frame2Width = frame2.winfo_width() 
+        self.frame2Heigth = frame2.winfo_height()     
+            
         
         label = tk.Label(frame2, text = global_store.data['imgPath'])
         label.pack(fill="both", expand=True)
@@ -42,6 +35,17 @@ class EDITORPAGE(tk.Frame):
         label2 = tk.Label(frame2)
         label2.pack(fill="both", expand=True)
         frame2.bind("<Configure>", lambda e: self.resize_image(e, frame2, global_store.data['imgPath'], label2))
+        
+        label3 = tk.Button(frame1, text = "New",command =self.show_file_page)
+        label3.pack(padx=10,pady=10,fill="both", expand=False)
+        self.imageCropFrame = frame2
+        label4 = tk.Button(frame1, text = "Crop",command=self.crop_image)
+        label4.pack(padx=10,pady=10,fill="both", expand=False)
+        
+        label5 = tk.Button(frame1, text = "Resize")
+        label5.pack(padx=10,pady=10,fill="both", expand=False)       
+        
+        
 
       
     
@@ -50,11 +54,20 @@ class EDITORPAGE(tk.Frame):
     
         # Open and resize the image to fill the exact dimensions
         img = Image.open(image_path).resize((new_width, new_height), Image.Resampling.LANCZOS)
-        photo = ImageTk.PhotoImage(img)
+        self.photo = ImageTk.PhotoImage(img)
         
-        label.config(image=photo)
-        label.image = photo  # Keep reference to avoid garbage collection
-        
+        label.config(image=self.photo)
+        label.image = self.photo  # Keep reference to avoid garbage collection
+        self.frame2Width = frame.winfo_width() 
+        self.frame2Heigth = frame.winfo_height()
+    
+    def crop_image(self):
+        print(self.frame2Width,self.frame2Heigth)
+        canvas = tk.Canvas(self.imageCropFrame, width=self.frame2Width, height=self.frame2Heigth, highlightthickness=0)
+        self.image_on_canvas = canvas.create_image(0, 0, anchor="nw", image=self.photo)
+        canvas.place(x=0, y=0)
+        ds = DrawSquareApp(canvas)
+         
     def show_file_page(self):
         response = mb.askyesno("Confirmation", "Do you want to continue?")
         if response:

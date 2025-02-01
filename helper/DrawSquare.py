@@ -1,27 +1,7 @@
-import tkinter as tk
-from PIL import Image, ImageTk
-
 class DrawSquareApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Draw a Square Over an Image in a Label")
-
-        # Create a frame to contain the label and canvas
-        self.frame = tk.Frame(root, bg="lightgray", width=500, height=400)
-        self.frame.pack(pady=20, padx=20)
-
-        # Load and display the image inside a label
-        self.image_path = "your_image_path.jpg"  # Replace with your image path
-        self.img = Image.open(self.image_path)
-        self.img = self.img.resize((500, 400), Image.Resampling.LANCZOS)  # Resize image to fit frame
-        self.photo = ImageTk.PhotoImage(self.img)
-
-        # Create a label to display the image
-        self.label = tk.Label(self.frame, image=self.photo)
-        self.label.pack()
-
+    def __init__(self, canvas):       
         # Create a canvas over the label for drawing
-        self.canvas = tk.Canvas(self.frame, width=500, height=400, highlightthickness=0)
+        self.canvas = canvas
         self.canvas.place(x=0, y=0)
 
         # Variables for tracking drawing
@@ -59,8 +39,5 @@ class DrawSquareApp:
     def finish_draw(self, event):
         """ Finalize the square when the mouse is released. """
         self.start_x, self.start_y = None, None  # Reset start position
-
-# Run the application
-root = tk.Tk()
-app = DrawSquareApp(root)
-root.mainloop()
+        
+    
