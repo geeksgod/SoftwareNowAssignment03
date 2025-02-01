@@ -53,8 +53,8 @@ class EDITORPAGE(tk.Frame):
         new_width, new_height = frame.winfo_width(), frame.winfo_height()
     
         # Open and resize the image to fill the exact dimensions
-        img = Image.open(image_path).resize((new_width, new_height), Image.Resampling.LANCZOS)
-        self.photo = ImageTk.PhotoImage(img)
+        self.img = Image.open(image_path).resize((new_width, new_height), Image.Resampling.LANCZOS)
+        self.photo = ImageTk.PhotoImage(self.img)
         
         label.config(image=self.photo)
         label.image = self.photo  # Keep reference to avoid garbage collection
@@ -66,7 +66,7 @@ class EDITORPAGE(tk.Frame):
         canvas = tk.Canvas(self.imageCropFrame, width=self.frame2Width, height=self.frame2Heigth, highlightthickness=0)
         self.image_on_canvas = canvas.create_image(0, 0, anchor="nw", image=self.photo)
         canvas.place(x=0, y=0)
-        ds = DrawSquareApp(canvas)
+        ds = DrawSquareApp(canvas,self.img)
          
     def show_file_page(self):
         response = mb.askyesno("Confirmation", "Do you want to continue?")
