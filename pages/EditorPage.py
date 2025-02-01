@@ -3,6 +3,8 @@ from helper.Globalstore import global_store
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
+from tkinter import messagebox as mb
+
 
 class EDITORPAGE(tk.Frame):
      
@@ -54,4 +56,9 @@ class EDITORPAGE(tk.Frame):
         label.image = photo  # Keep reference to avoid garbage collection
         
     def show_file_page(self):
-         self.controller.show_file_upload_page()
+        response = mb.askyesno("Confirmation", "Do you want to continue?")
+        if response:
+            self.controller.show_file_upload_page()
+        else:
+            print("User clicked No")
+         
