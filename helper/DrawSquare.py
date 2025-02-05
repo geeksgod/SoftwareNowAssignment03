@@ -63,24 +63,30 @@ class DrawSquareApp:
         cropped_image = self.cv_image[y1:y2, x1:x2]
 
         # Convert the cropped image back to PIL for Tkinter
-        cropped_pil_image = Image.fromarray(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB))
+        self.cropped_pil_image = Image.fromarray(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB))
 
         # Convert to PhotoImage for displaying in Tkinter
-        cropped_photo = ImageTk.PhotoImage(cropped_pil_image)
+        cropped_photo = ImageTk.PhotoImage(self.cropped_pil_image)
 
-        self.show_cropped_image(cropped_photo,cropped_pil_image)
+        self.show_cropped_image(cropped_photo)
 
-    def show_cropped_image(self, cropped_photo,cropped_pil_image):
+    def show_cropped_image(self, cropped_photo):
         """ Show cropped image in a new dialog box with Yes/No options. """
-        dialog = tk.Toplevel(self.canvas)
+        dialog = tk.Toplevel(self.canvas,height=800,width= 900)
         dialog.title("Cropped Image")
-
+        
+        #Make the dialog full screen
+        dialog.attributes("-fullscreen", True)
+        
+        dialog.bind("<Escape>", lambda e: dialog.destroy())
         # Display the cropped image in the dialog
         label = tk.Label(dialog, text="Do you want to save the image?")
         label.pack()
-        label = tk.Label(dialog, image=cropped_photo)
-        label.pack()
-
+        self.crop_image_label = tk.Label(dialog, image=cropped_photo)
+        self.crop_image_label.pack()
+        
+       
+        
         # Function to handle Yes button click
         def on_yes():
             folder_path = "saved_crops"  # Define the folder path
@@ -91,7 +97,7 @@ class DrawSquareApp:
 
             # Save the cropped image inside the folder
             saved_image_path = os.path.join(folder_path, "cropped_image.jpg")
-            cropped_pil_image.save(saved_image_path)
+            self.cropped_pil_image.save(saved_image_path)
 
             messagebox.showinfo("Image Saved", f"The cropped image has been saved to: {saved_image_path}")
             dialog.destroy()
@@ -101,11 +107,34 @@ class DrawSquareApp:
             messagebox.showinfo("No Clicked", "You clicked No!")
             dialog.destroy()
         # Create Yes and No buttons
-        yes_button = tk.Button(dialog, text="Yes", command=on_yes)
-        yes_button.pack(side="left", padx=10, pady=10)
+        
+        frame = tk.Frame(dialog)
+        frame.pack(side='bottom',fill= "none")
+        
+        yes_button = tk.Button(frame, text="Yes", command=on_yes)
+        yes_button.pack(side="left",padx=10, pady=10)
+        
 
-        no_button = tk.Button(dialog, text="No", command=on_no)
-        no_button.pack(side="right", padx=10, pady=10)
+        no_button = tk.Button(frame, text="No", command=on_no)
+        no_button.pack(side='right',padx=10, pady=10)
+        
+        
+        slider = tk.Scale(dialog, from_=50, to=200, orient="horizontal", label="Resize Image (%)", command=self.slider_resize_image)
+        slider.set(100)  # Default at 100%
+        slider.pack(side='bottom')
+        
+        
 
         # Keep reference to avoid garbage collection
         dialog.image = cropped_photo
+        
+    def slider_resize_image(self,scale_value):
+            scale_factor = float(scale_value) / 100
+            new_width = int(self.cropped_pil_image.width * scale_factor)
+            new_height = int(self.cropped_pil_image.height * scale_factor)
+            print(new_height,new_width)
+            resized_img = self.cropped_pil_image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            self.resized_photo = ImageTk.PhotoImage(resized_img)
+            self.resized_photo = ImageTk.PhotoImage(resized_img)
+            self.crop_image_label.config(image=self.resized_photo)
+            self.crop_image_label.image = self.resized_photo
