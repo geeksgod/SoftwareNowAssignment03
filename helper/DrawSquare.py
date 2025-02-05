@@ -1,9 +1,9 @@
-from PIL import Image, ImageTk
 import cv2
 from tkinter import messagebox
 import numpy as np
 import tkinter as tk
 import os
+from .cvutils import *
 
 class DrawSquareApp:
     def __init__(self, canvas,image):       
@@ -60,51 +60,48 @@ class DrawSquareApp:
         x1, y1, x2, y2 = map(int, coords)  # Coordinates of the square
 
         # Crop the image using OpenCV (use NumPy slicing)
-        cropped_image = self.cv_image[y1:y2, x1:x2]
+        self.cropped_image = self.cv_image[y1:y2, x1:x2]
 
         # Convert the cropped image back to PIL for Tkinter
-        self.cropped_pil_image = Image.fromarray(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB))
+        cropped_rgb = cv2.cvtColor(self.cropped_image, cv2.COLOR_BGR2RGB)
 
-        # Convert to PhotoImage for displaying in Tkinter
-        cropped_photo = ImageTk.PhotoImage(self.cropped_pil_image)
 
+        # Convert OpenCV image to Tkinter PhotoImage (using numpy and Tkinter)
+        cropped_photo = tk.PhotoImage(data=cv2.imencode('.ppm', cropped_rgb)[1].tobytes())
+        
         self.show_cropped_image(cropped_photo)
 
     def show_cropped_image(self, cropped_photo):
         """ Show cropped image in a new dialog box with Yes/No options. """
-        dialog = tk.Toplevel(self.canvas,height=800,width= 900)
+        dialog = tk.Toplevel(self.canvas,height=1100,width= 900)
+        dialog.geometry("900x600")
         dialog.title("Cropped Image")
-        
+        dialog.resizable(False,False)
         #Make the dialog full screen
-        dialog.attributes("-fullscreen", True)
+        # dialog.attributes("-fullscreen", True)
         
         dialog.bind("<Escape>", lambda e: dialog.destroy())
         # Display the cropped image in the dialog
         label = tk.Label(dialog, text="Do you want to save the image?")
         label.pack()
-        self.crop_image_label = tk.Label(dialog, image=cropped_photo)
+        image_frame = tk.Frame(dialog, width=600, height=350, bg="gray")
+        image_frame.pack_propagate(False)  # Prevent resizing
+        image_frame.pack(fill=tk.BOTH, expand=True)
+        
+        self.crop_image_label = tk.Label(image_frame, image=cropped_photo)
         self.crop_image_label.pack()
         
        
         
         # Function to handle Yes button click
-        def on_yes():
+        def on_yes():            
             folder_path = "saved_crops"  # Define the folder path
-
-            # Check if folder exists, if not create it
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
-
-            # Save the cropped image inside the folder
-            saved_image_path = os.path.join(folder_path, "cropped_image.jpg")
-            self.cropped_pil_image.save(saved_image_path)
-
-            messagebox.showinfo("Image Saved", f"The cropped image has been saved to: {saved_image_path}")
+            save_image(folder_path,self.resized_img)
+            messagebox.showinfo("Sucess!!", f"Image saved to {folder_path}")
             dialog.destroy()
-
-        # Function to handle No button click
+                
         def on_no():
-            messagebox.showinfo("No Clicked", "You clicked No!")
+            messagebox.showinfo("Sucess!!", "The Image has been discarded")
             dialog.destroy()
         # Create Yes and No buttons
         
@@ -119,7 +116,7 @@ class DrawSquareApp:
         no_button.pack(side='right',padx=10, pady=10)
         
         
-        slider = tk.Scale(dialog, from_=50, to=200, orient="horizontal", label="Resize Image (%)", command=self.slider_resize_image)
+        slider = tk.Scale(dialog, from_=50, to=150, orient="horizontal", label="Resize Image (%)", command=self.slider_resize_image)
         slider.set(100)  # Default at 100%
         slider.pack(side='bottom')
         
@@ -130,11 +127,17 @@ class DrawSquareApp:
         
     def slider_resize_image(self,scale_value):
             scale_factor = float(scale_value) / 100
-            new_width = int(self.cropped_pil_image.width * scale_factor)
-            new_height = int(self.cropped_pil_image.height * scale_factor)
+            new_width = int(self.cropped_image.shape[1] * scale_factor)
+            new_height = int(self.cropped_image.shape[0] * scale_factor)
             print(new_height,new_width)
-            resized_img = self.cropped_pil_image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-            self.resized_photo = ImageTk.PhotoImage(resized_img)
-            self.resized_photo = ImageTk.PhotoImage(resized_img)
+            self.resized_img = cv2.resize(self.cropped_image, (new_width, new_height), interpolation=cv2.INTER_LANCZOS4)
+    
+            # Convert BGR (OpenCV) to RGB (for Tkinter display)
+            resized_rgb = cv2.cvtColor(self.resized_img, cv2.COLOR_BGR2RGB)
+
+            # Convert the resized OpenCV image to Tkinter PhotoImage
+            self.resized_photo = tk.PhotoImage(data=cv2.imencode('.ppm', resized_rgb)[1].tobytes())
+
+            # Update label with the resized image
             self.crop_image_label.config(image=self.resized_photo)
             self.crop_image_label.image = self.resized_photo

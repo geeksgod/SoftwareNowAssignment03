@@ -14,6 +14,7 @@ class FILEUPLOADPAGE(tk.Frame):
         self.canvas = tk.Canvas(self, width=500, height=200, bg="white", highlightthickness=0)    
         f = FILEUPLOAD(self.canvas,upload_action=self.upload_action)
         self.image_path = f.get_image_path()
+        self.bind_all("<Control-o>",lambda event:self.upload_action())
         print("here",self.image_path)
     
     def upload_action(self):
