@@ -1,7 +1,7 @@
 import tkinter as tk
-from helper.FileUpload import FILEUPLOAD
+from widgets.FileUpload import FILEUPLOAD
 from tkinter import filedialog
-from helper.ErrorMssage import ErrorMessage
+from widgets.ErrorMssage import ErrorMessage
 from .EditorPage import EDITORPAGE
 from helper.Globalstore import global_store
 
