@@ -14,7 +14,7 @@ class FILEUPLOAD(BASEWIDGET):
         width=2            
         )
         upload_label =  LABEL(self.canvas)
-        upload_label.createLabel("Please!! Select the file you want to edit")
+        upload_label.createLabel("Please!! Select the file you want to edit\nor Press CTRL+ O")
         button = self.tk.Button(self.canvas, text='Browse Picture', command=upload_action)
         button.place(x=250,y =80, anchor='center')
     
