@@ -50,6 +50,7 @@ class DrawSquareApp:
         self.start_x, self.start_y = None, None  # Reset start position
         self.crop_inside_square()
         
+        
     def crop_inside_square(self):
         """ Crop the image inside the square using OpenCV. """
         if not self.square:
