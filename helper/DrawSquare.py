@@ -96,7 +96,7 @@ class DrawSquareApp:
         
         # Function to handle Yes button click
         def on_yes():            
-            folder_path = "saved_crops"  # Define the folder path
+            folder_path = "output"  # Define the folder path
             save_image(folder_path,self.resized_img)
             messagebox.showinfo("Sucess!!", f"Image saved to {folder_path}")
             dialog.destroy()

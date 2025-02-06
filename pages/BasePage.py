@@ -19,14 +19,16 @@ class APP(tk.Tk):
         self.current_frame = None
         self.show_file_upload_page()  # Initially show the start page
        
-    def show_file_upload_page(self):        
+    def show_file_upload_page(self):    
+        """function to activaate the file upload page"""    
         if self.current_frame:
             self.current_frame.destroy()
-            
+        
         self.current_frame = FILEUPLOADPAGE(self.container, self)
         self.current_frame.pack(fill="both", expand=True)
         
-    def show_editor_page(self):        
+    def show_editor_page(self):
+        """Function to activate the editor page"""        
         if self.current_frame:
             self.current_frame.destroy()
             

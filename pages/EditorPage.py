@@ -135,10 +135,10 @@ class EDITORPAGE(tk.Frame):
         if(self.crop_canvas.winfo_exists()):self.crop_canvas.place_forget()    #hides the crop canvas with crop function activated
 
         if(self.is_cv2_image(self.blured_image)):
-            folder_path = "saved_crops"  # Define the folder path
+            folder_path = "output"  # Define the folder path
             save_image(folder_path,self.blured_image) #saves np array in png format
         else:
-            folder_path = "saved_crops"  # Define the folder path
+            folder_path = "output"  # Define the folder path
             save_image(folder_path,self.reimg)
     
     def undo_action(self):
